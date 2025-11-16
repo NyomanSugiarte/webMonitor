@@ -17,7 +17,7 @@
             justify-content: center;
             font-family: 'Inter', sans-serif;
         }
-        
+
         .container-home {
             text-align: center;
             background: rgba(255, 255, 255, 0.95);
@@ -26,19 +26,19 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             max-width: 600px;
         }
-        
+
         .header-home h1 {
             color: #333;
             margin-bottom: 10px;
             font-weight: 700;
         }
-        
+
         .header-home p {
             color: #666;
             font-size: 18px;
             margin-bottom: 40px;
         }
-        
+
         .btn-menu {
             display: inline-block;
             width: 100%;
@@ -52,34 +52,21 @@
             transition: all 0.3s ease;
             cursor: pointer;
         }
-        
+
         .btn-admin {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
-        
-        .btn-admin:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-            color: white;
-            text-decoration: none;
-        }
-        
+
         .btn-monitoring {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: white;
         }
-        
-        .btn-monitoring:hover {
+
+        .btn-menu:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(245, 87, 108, 0.4);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             color: white;
-            text-decoration: none;
-        }
-        
-        .icon-menu {
-            font-size: 24px;
-            margin-right: 10px;
         }
     </style>
 </head>
@@ -93,17 +80,30 @@
         </div>
 
         <div class="menu-section">
-            <a href="admin.html" class="btn btn-menu btn-admin">
-                <i class="fas fa-laptop-house icon-menu"></i>ADMIN PANEL
-            </a>
-            
+            <button class="btn btn-menu btn-admin" onclick="openAdmin()">
+                <i class="fas fa-laptop-house"></i> ADMIN PANEL
+            </button>
+
             <a href="monitor.html" class="btn btn-menu btn-monitoring">
-                <i class="fas fa-eye icon-menu"></i>MONITORING
+                <i class="fas fa-eye"></i> MONITORING
             </a>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.6/js/bootstrap.bundle.min.js"></script>
-</body>
+    <script>
+        function openAdmin() {
+            const password = prompt("Masukkan Password Admin:");
 
+            // GANTI PASSWORD DI SINI
+            const correctPassword = "andnan123";
+
+            if (password === correctPassword) {
+                window.location.href = "admin.html";
+            } else if (password !== null) {
+                alert("Password salah!");
+            }
+        }
+    </script>
+
+</body>
 </html>
