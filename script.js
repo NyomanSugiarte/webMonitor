@@ -153,11 +153,7 @@ const x_data = () => {
         },
 
         async logout() {
-            this.currentScreen = 'menu';
-            this.currentMode = 'monitoring';
-            this.loginUsername = '';
-            this.loginPassword = '';
-            toastr.info('Logged out successfully');
+            window.location.href = "index.html";
         },
 
         async backToMenu() {
