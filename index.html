@@ -5,9 +5,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Krakatau Andover - Home</title>
+
+    <!-- Bootstrap -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.6/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.6/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -67,11 +75,14 @@
             transform: translateY(-3px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             color: white;
+            
         }
     </style>
 </head>
 
 <body>
+
+    <!-- MAIN CONTENT -->
     <div class="container-home">
         <div class="header-home">
             <h1><i class="fas fa-ship"></i> KRAKATAU ANDOVER</h1>
@@ -80,33 +91,72 @@
         </div>
 
         <div class="menu-section">
-            <button class="btn btn-menu btn-admin" onclick="openAdmin()">
+            <button class="btn btn-menu btn-admin" onclick="showAdminModal()">
                 <i class="fas fa-laptop-house"></i> ADMIN PANEL
             </button>
 
             <a href="monitor.html" class="btn btn-menu btn-monitoring">
                 <i class="fas fa-eye"></i> MONITORING
             </a>
+
             <a href="guest.html" class="btn btn-menu btn-monitoring">
-                <i class="fas fa-eye"></i> For Guest User
+                <i class="fas fa-user"></i> For Guest User
             </a>
         </div>
     </div>
 
+    <!-- ADMIN PASSWORD MODAL -->
+    <div class="modal fade" id="adminModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-3">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-lock"></i> Admin Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <label class="form-label">Masukkan Password Admin</label>
+                    <input type="password" id="adminPassword" class="form-control" placeholder="Password">
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button class="btn btn-primary" onclick="submitAdminPassword()">Masuk</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS LOGIC -->
     <script>
-        function openAdmin() {
-            const password = prompt("Masukkan Password Admin:");
+        const correctPassword = "adnan123";
 
-            // GANTI PASSWORD DI SINI
-            const correctPassword = "adnan123";
+        function showAdminModal() {
+            const modal = new bootstrap.Modal(document.getElementById("adminModal"));
+            modal.show();
 
-            if (password === correctPassword) {
+            // Auto focus input
+            setTimeout(() => {
+                document.getElementById("adminPassword").focus();
+            }, 300);
+        }
+
+        function submitAdminPassword() {
+            const pw = document.getElementById("adminPassword").value;
+
+            if (pw === correctPassword) {
                 window.location.href = "admin.html";
-            } else if (password !== null) {
+            } else {
                 alert("Password salah!");
             }
         }
+
+        // Tekan ENTER untuk login
+        document.getElementById("adminPassword").addEventListener("keyup", function (e) {
+            if (e.key === "Enter") submitAdminPassword();
+        });
     </script>
 
 </body>
+
 </html>
