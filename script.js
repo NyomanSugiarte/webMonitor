@@ -78,14 +78,49 @@ const x_data = () => {
             // Inisialisasi GPS Tracker Canvas
             this.initGPSCanvas();
 
-            // Jalankan loop update setiap 2 detik
+            // === AUTO CONNECT GCS dengan retry ===
+            const autoConnectWithRetry = async (maxRetries = 5, delay = 2000) => {
+                for (let i = 0; i < maxRetries; i++) {
+                    try {
+                        console.log(`🔄 Auto-connecting to GCS (Attempt ${i + 1}/${maxRetries})...`);
+                        await this.connectGcs();
+                        console.log('✓ Auto-connect successful!');
+                        return true;
+                    } catch (err) {
+                        console.warn(`Attempt ${i + 1} failed:`, err.message);
+                        if (i < maxRetries - 1) {
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                        }
+                    }
+                }
+                console.error('❌ Auto-connect failed after all retries');
+                return false;
+            };
+
+            // Jalankan auto-connect tanpa menunggu
+            autoConnectWithRetry();
+
+            // === AUTO LOAD CAMERA STREAMS ===
+            const loadCameraStreams = () => {
+                this.surfaceCamera.streamUrl = `${this.ipAddress}/camera/surface-stream`;
+                this.underwaterCamera.streamUrl = `${this.ipAddress}/camera/underwater-stream`;
+                this.updateCameraImages();
+            };
+            
+            loadCameraStreams();
+
+            // === AUTO START GPS TRACKING ===
+            this.gpsTracker.isTracking = true;
+            console.log('✓ GPS Tracking started automatically');
+
+            // === MAIN UPDATE LOOP setiap 2 detik ===
             setInterval(async () => {
                 try {
                     if (this.realtimeData) {
                         const response = await axios.get(`${this.ipAddress}/context`);
                         this.vehicleData = response.data.data;
 
-                        // === Sinkronisasi status kamera dengan context server ===
+                        // Sinkronisasi status kamera
                         if (this.vehicleData.surface_camera_connect) {
                             this.surfaceCamera.streamUrl = `${this.ipAddress}/camera/surface-stream`;
                         } else {
@@ -97,24 +132,28 @@ const x_data = () => {
                         } else {
                             this.underwaterCamera.streamUrl = "";
                         }
+
+                        // Update camera images
                         const timestamp = new Date().getTime();
                         this.surfaceCamera.image = `${this.ipAddress}/camera/surface-latest?ts=${timestamp}`;
                         this.underwaterCamera.image = `${this.ipAddress}/camera/underwater-latest?ts=${timestamp}`;
+                        this.surfaceCamera.refreshImage++;
 
-                        // Update otomatis waypoint capture dan GPS
-                        this.waypointCaptureSurfaceAuto();
-                        this.waypointCaptureUnderwaterAuto();
+                        // Update GPS dari vehicle data
                         this.updateGPSFromVehicle();
+
+                        // Update current time & date
+                        this.currentTime = moment().format("HH:mm");
+                        this.currentDate = moment().format("YYYY-MM-DD");
                     }
                 } catch (err) {
-                    console.warn("Gagal ambil data context:", err.message);
+                    console.warn('Update loop error:', err.message);
                 }
             }, 2000);
 
-            // Update jam dan tanggal
+            // Update clock setiap 1 detik
             setInterval(() => {
-                this.currentDate = moment().format("YYYY-MM-DD");
-                this.currentTime = moment().format("HH:mm:ss");
+                this.currentTime = moment().format("HH:mm");
             }, 1000);
 
             // toastr config
@@ -127,6 +166,13 @@ const x_data = () => {
 
             // Request wake lock untuk GPS tracking
             this.requestWakeLock();
+        },
+
+        // Helper function untuk update camera images
+        updateCameraImages() {
+            const timestamp = new Date().getTime();
+            this.surfaceCamera.image = `${this.ipAddress}/camera/surface-latest?ts=${timestamp}`;
+            this.underwaterCamera.image = `${this.ipAddress}/camera/underwater-latest?ts=${timestamp}`;
         },
 
         // ========== EXISTING METHODS ==========
@@ -153,7 +199,11 @@ const x_data = () => {
         },
 
         async logout() {
-            window.location.href = "index.html";
+            this.currentScreen = 'menu';
+            this.currentMode = 'monitoring';
+            this.loginUsername = '';
+            this.loginPassword = '';
+            toastr.info('Logged out successfully');
         },
 
         async backToMenu() {
