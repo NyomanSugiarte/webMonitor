@@ -490,16 +490,16 @@
                         <form>
                             <div class="mb-3">
                                 <label for="ipAddress" class="form-label">
-                                    <i class="fas fa-network-wired me-1"></i>API
+                                    <i class="fas fa-network-wired me-1"></i>IP Address
                                 </label>
-                                <input type="password" class="form-control" id="ipAddress" x-model="ipAddress"
+                                <input type="text" class="form-control" id="ipAddress" x-model="ipAddress"
                                     placeholder="192.168.1.100" />
                             </div>
                             <div class="mb-3">
                                 <label for="port" class="form-label">
                                     <i class="fas fa-plug me-1"></i>Port
                                 </label>
-                                <input type="password" class="form-control" id="port" x-model="port" placeholder="/dev/pixhawk" />
+                                <input type="text" class="form-control" id="port" x-model="port" placeholder="/dev/pixhawk" />
                             </div>
                             <div class="mb-3">
                                 <label for="baudrate" class="form-label">
@@ -539,6 +539,7 @@
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.14.8/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="script.js"></script>
 </body>
 
