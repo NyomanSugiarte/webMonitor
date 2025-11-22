@@ -77,83 +77,64 @@ const x_data = () => {
         async init() {
             // Inisialisasi GPS Tracker Canvas
             this.initGPSCanvas();
+            this.socket = io(this.ipAddress, {
+                transports: ["websocket", "polling"],
+                path: "/socket.io/",
+            });
 
-            // === AUTO CONNECT GCS dengan retry ===
-            const autoConnectWithRetry = async (maxRetries = 5, delay = 2000) => {
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        console.log(`🔄 Auto-connecting to GCS (Attempt ${i + 1}/${maxRetries})...`);
-                        await this.connectGcs();
-                        console.log('✓ Auto-connect successful!');
-                        return true;
-                    } catch (err) {
-                        console.warn(`Attempt ${i + 1} failed:`, err.message);
-                        if (i < maxRetries - 1) {
-                            await new Promise(resolve => setTimeout(resolve, delay));
-                        }
-                    }
-                }
-                console.error('❌ Auto-connect failed after all retries');
-                return false;
-            };
 
-            // Jalankan auto-connect tanpa menunggu
-            autoConnectWithRetry();
+            this.socket.on("connect", () => {
+                toastr.success("Connected to server WebSocket!");
+                this.vehicleData.app_connect = true;
+            });
 
-            // === AUTO LOAD CAMERA STREAMS ===
-            const loadCameraStreams = () => {
-                this.surfaceCamera.streamUrl = `${this.ipAddress}/camera/surface-stream`;
-                this.underwaterCamera.streamUrl = `${this.ipAddress}/camera/underwater-stream`;
-                this.updateCameraImages();
-            };
-            
-            loadCameraStreams();
+            this.socket.on("disconnect", () => {
+                this.vehicleData.app_connect = false;
+                toastr.error("Lost WebSocket connection!");
+            });
 
-            // === AUTO START GPS TRACKING ===
-            this.gpsTracker.isTracking = true;
-            console.log('✓ GPS Tracking started automatically');
+            this.socket.on("get_params", (data) => {
+                // Update live data
+                this.vehicleData = data;
+            });
 
-            // === MAIN UPDATE LOOP setiap 2 detik ===
+            // Jalankan loop update setiap 2 detik
             setInterval(async () => {
                 try {
                     if (this.realtimeData) {
                         const response = await axios.get(`${this.ipAddress}/context`);
                         this.vehicleData = response.data.data;
 
-                        // Sinkronisasi status kamera
+                        // === Sinkronisasi status kamera dengan context server ===
                         if (this.vehicleData.surface_camera_connect) {
-                            this.surfaceCamera.streamUrl = `${this.ipAddress}/camera/surface-stream`;
+                            this.surfaceCamera.streamUrl = `${this.ipAddress}/camera/surface-stream?ts=${Date.now()}`;
                         } else {
                             this.surfaceCamera.streamUrl = "";
                         }
 
                         if (this.vehicleData.underwater_camera_connect) {
-                            this.underwaterCamera.streamUrl = `${this.ipAddress}/camera/underwater-stream`;
+                            this.underwaterCamera.streamUrl = `${this.ipAddress}/camera/underwater-stream?ts=${Date.now()}`;
                         } else {
                             this.underwaterCamera.streamUrl = "";
                         }
-
-                        // Update camera images
                         const timestamp = new Date().getTime();
                         this.surfaceCamera.image = `${this.ipAddress}/camera/surface-latest?ts=${timestamp}`;
                         this.underwaterCamera.image = `${this.ipAddress}/camera/underwater-latest?ts=${timestamp}`;
-                        this.surfaceCamera.refreshImage++;
 
-                        // Update GPS dari vehicle data
+                        // Update otomatis waypoint capture dan GPS
+                        this.waypointCaptureSurfaceAuto();
+                        this.waypointCaptureUnderwaterAuto();
                         this.updateGPSFromVehicle();
-
-                        // Update current time & date
-                        this.currentTime = moment().format("HH:mm");
-                        this.currentDate = moment().format("YYYY-MM-DD");
                     }
                 } catch (err) {
-                    console.warn('Update loop error:', err.message);
+                    console.warn("Gagal ambil data context:", err.message);
                 }
             }, 2000);
 
-            // Update clock setiap 1 detik
+            // Update jam dan tanggal
             setInterval(() => {
-                this.currentTime = moment().format("HH:mm");
+                this.currentDate = moment().format("YYYY-MM-DD");
+                this.currentTime = moment().format("HH:mm:ss");
             }, 1000);
 
             // toastr config
@@ -166,13 +147,6 @@ const x_data = () => {
 
             // Request wake lock untuk GPS tracking
             this.requestWakeLock();
-        },
-
-        // Helper function untuk update camera images
-        updateCameraImages() {
-            const timestamp = new Date().getTime();
-            this.surfaceCamera.image = `${this.ipAddress}/camera/surface-latest?ts=${timestamp}`;
-            this.underwaterCamera.image = `${this.ipAddress}/camera/underwater-latest?ts=${timestamp}`;
         },
 
         // ========== EXISTING METHODS ==========
@@ -544,22 +518,22 @@ const x_data = () => {
             if (!this.gpsTracker.ctx) return;
             const ctx = this.gpsTracker.ctx;
             const canvas = this.gpsTracker.canvas;
-            
+
             // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
+
             // Draw pattern PERTAMA (background)
             this.drawExamplePattern();
-            
+
             // Draw axes dan grid
             this.drawAxes();
             this.drawOrigin();
-            
+
             // Draw trajectory PATH
             if (this.gpsTracker.path.length > 0) {
                 this.drawPath();
             }
-            
+
             // Update scale info
             this.updateScaleInfo();
         },
@@ -636,17 +610,17 @@ const x_data = () => {
                 ctx.arc(p.canvasX, p.canvasY, isLast ? 7 : 3, 0, 2 * Math.PI);
                 ctx.fillStyle = isLast ? '#ff0000' : '#00e1ffff';
                 ctx.fill();
-                
+
                 if (isLast) {
                     ctx.strokeStyle = '#000000ff';
                     ctx.lineWidth = 2;
                     ctx.stroke();
-                    
+
                     // Label koordinat terakhir
                     ctx.fillStyle = '#ff0000';
                     ctx.font = 'bold 10px Arial, sans-serif';
                     ctx.fillText(`(${p.x.toFixed(1)},${p.y.toFixed(1)})`, p.canvasX + 10, p.canvasY - 8);
-                    
+
                     // Draw arrow
                     if (path.length > 1) {
                         const prev = path[path.length - 2];
