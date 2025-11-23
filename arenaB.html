@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Krakatau Andover Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.6/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body x-data="x_data()" x-init="init()">
+    <!-- HEADER -->
+    <div class="page-container">
+        <!-- HEADER -->
+        <div class="header">
+            <div>
+                <strong><i class="fas fa-ship me-2"></i>KRAKATAU ANDOVER</strong>
+                <template x-if="vehicleData.app_connect">
+                    <span class="status-connected"><i class="fas fa-wifi me-1"></i>CONNECTED</span>
+                </template>
+                <template x-if="!vehicleData.app_connect">
+                    <span class="status-disconnected"><i class="fas fa-exclamation-circle me-1"></i>DISCONNECTED</span>
+                </template>
+                <div class="text">
+                    <span x-text="currentTime"></span>
+                    <i>/</i>
+                    <span x-text="currentDate"></span>
+                </div>
+            </div>
+            <div>
+                <span class="fas fa-university me-2"></span>UNIVERSITAS TEKNOKRAT INDONESIA
+                <span class="fas me-1"></span>LINTASAN: B
+            </div>
+        </div>
+        <div class="grid-6-cards">
+            <!-- Box 1 -->
+            <div class="card-custom p-3">
+
+                <div class="card-title"><i class="fas fa-video me-2"></i>SURFACE CAMERA STREAM</div>
+                <div class="card-body-flex">
+                    <img :key="surfaceCamera.refreshStream" class="image-placeholder image-fill"
+                        :src="surfaceCamera.streamUrl" alt="Surface Camera" />
+                </div>
+
+            </div>
+
+            <!-- Box 2 -->
+            <div class="card-custom p-3">
+
+                <div class="card-title"><i class="fas fa-map-marked-alt me-2"></i>GPS TRAJECTORY</div>
+                <div id="canvasContainer">
+                    <canvas id="gpsCanvas" width="300" height="300"></canvas>
+                </div>
+                <div class="text-center mt-3">
+                    <button @click="clearGPSPath()" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash me-1"></i>CLEAR
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Box 3 -->
+            <div class="card-custom p-3">
+
+                <div class="card-title"><i class="fas fa-water me-2"></i>UNDERWATER CAMERA STREAM</div>
+                <div class="card-body-flex">
+                    <img class="image-placeholder image-fill" :src="underwaterCamera.streamUrl"
+                        alt="Underwater Camera" />
+                </div>
+
+            </div>
+
+            <!-- Box 4 -->
+            <div class="card-custom p-3">
+
+                <div class="card-title"><i class="fas fa-image me-2"></i>SURFACE IMAGE</div>
+                <img class="image-placeholder" :src="surfaceCamera.image" alt="Surface Image" />
+
+            </div>
+
+            <!-- Box 5 -->
+            <div class="card-custom p-3">
+                <div class="card-title">
+                    <i class="fas fa-gauge me-2"></i>VEHICLE DATA
+                </div>
+
+                <div class="vehicle-data">
+
+                    <!-- BOX 1: Attitude Information -->
+                    <div class="vehicle-section">
+                        <div class="vehicle-section-title">
+                            Attitude Information
+                        </div>
+
+                        <div class="vehicle-row">
+                            <span class="vehicle-label">Speed Over Ground</span>
+                            <span class="vehicle-value">
+                                <span x-text="vehicleData.sog ? vehicleData.sog.toFixed(2) : '0.00'"></span>
+                                <span class="vehicle-unit"> m/s</span>
+                            </span>
+                        </div>
+
+                        <div class="vehicle-row">
+                            <span class="vehicle-label">Course Over Ground</span>
+                            <span class="vehicle-value">
+                                <span x-text="vehicleData.cog ? vehicleData.cog.toFixed(2) : '0.00'"></span>
+                                <span class="vehicle-unit"> °</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- BOX 2: Coordinate Information -->
+                    <div class="vehicle-section">
+                        <div class="vehicle-section-title">
+                            Coordinate Information
+                        </div>
+
+                        <div class="vehicle-row">
+                            <span class="vehicle-label">Latitude</span>
+                            <span class="vehicle-value">
+                                <span x-text="vehicleData.lat ? vehicleData.lat.toFixed(6) : '0.000000'"></span>
+                                <span class="vehicle-unit"> °</span>
+                            </span>
+                        </div>
+
+                        <div class="vehicle-row">
+                            <span class="vehicle-label">Longitude</span>
+                            <span class="vehicle-value">
+                                <span x-text="vehicleData.long ? vehicleData.long.toFixed(6) : '0.000000'"></span>
+                                <span class="vehicle-unit"> °</span>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Box 6 -->
+            <div class="card-custom p-3">
+
+                <div class="card-title"><i class="fas fa-water me-2"></i>UNDERWATER IMAGE</div>
+                <img class="image-placeholder" :src="underwaterCamera.image" alt="Underwater Image" />
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.14.8/cdn.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="script_B.js"></script>
+</body>
+
+</html>
