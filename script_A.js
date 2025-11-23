@@ -51,6 +51,8 @@ const x_data = () => {
             underwater_camera_connect: false,
             yaw: 0,
             current_wp: 0,
+            sog: 0,
+            cog: 0,
         },
 
         // GPS Tracker properties
@@ -72,11 +74,33 @@ const x_data = () => {
             isTracking: false,
             wakeLock: null,
             retryCount: 0,
+
+            shipImage: null,
+            shipImageLoaded: false,
+            shipImageSize: 28,
         },
 
         async init() {
             // Inisialisasi GPS Tracker Canvas
             this.initGPSCanvas();
+            const gcsOK = await this.connectGcs();
+            if (!gcsOK) {
+                toastr.error("GCS not connected, GPS & cameras not started", "Error");
+            } else {
+                this.startGPSTracking();
+                try {
+                    await this.startSurfaceCamera();
+                }
+                catch (e) {
+                    console.warn("Failed to start surface camera:", e.message);
+                }
+                try {
+                    await this.startUnderwaterCamera();
+                }
+                catch (e) {
+                    console.warn("Failed to start underwater camera:", e.message);
+                }
+            }
             this.socket = io(this.ipAddress, {
                 transports: ["websocket", "polling"],
                 path: "/socket.io/",
@@ -192,8 +216,10 @@ const x_data = () => {
                     baudrate: this.baudrate
                 });
                 toastr.success("GCS connected successfully!", "Success");
+                return true;
             } catch (error) {
                 toastr.error("Failed to connect GCS", "Error");
+                return false;
             }
         },
 
@@ -369,19 +395,24 @@ const x_data = () => {
             // Responsive canvas sizing
             const container = canvas.parentElement;
             const containerWidth = container.clientWidth;
-            const size = Math.min(containerWidth, 300);
+            const size = 600;
 
             canvas.width = size;
             canvas.height = size;
             canvas.style.width = '100%';
-            canvas.style.height = 'auto';
-
+            canvas.style.height = '100%';
+            this.gpsTracker.shipImage = new Image();
+            this.gpsTracker.shipImage.onload = () => {
+                this.gpsTracker.shipImageLoaded = true;
+                this.drawGPSCanvas();   // redraw setelah gambar siap
+            };
+            this.gpsTracker.shipImage.src = '/img/kapal.png';
             this.drawGPSCanvas();
             console.log('GPS Tracker initialized - Canvas size:', size);
 
             // Redraw on window resize
             window.addEventListener('resize', () => {
-                const newSize = Math.min(container.clientWidth, 600);
+                const newSize = 600;
                 const canvas = this.gpsTracker.canvas;
                 if (Math.abs(canvas.width - newSize) > 50) {
                     canvas.width = newSize;
@@ -434,20 +465,20 @@ const x_data = () => {
             const boxBlueHeight = h * 0.025;
 
             // Posisi vertikal relatif
-            const topYGreen = h * 0.12;
-            const topYRed = h * 0.23;
+            const topYGreen = h * 0.24;
+            const topYRed = h * 0.3;
             const sideTopY = h * 0.35;
-            const sideGap = h * 0.07;
+            const sideGap = h * 0.19;
             const bottomY = h * 0.78;
 
             // Warna dengan opacity
-            const green = "#00cc6680";
-            const red = "#ff333380";
-            const blue = "#0066cc80";
+            const green = "#00a753ff";
+            const red = "#ff0000ff";
+            const blue = "#005fbefa";
 
             // ===== Titik di bagian atas =====
             const numTopDots = 4;
-            const topStartX = w * 0.28;
+            const topStartX = w * 0.38;
             const topEndX = w * 0.68;
             const topGapX = (topEndX - topStartX) / (numTopDots - 1);
 
@@ -468,50 +499,102 @@ const x_data = () => {
             }
 
             // ===== Titik di sisi kiri =====
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < 2; i++) {
                 const y = sideTopY + i * sideGap;
                 const x1 = w * 0.1;
                 const x2 = w * 0.20;
 
                 // Hijau
                 ctx.beginPath();
-                ctx.arc(x1, y, dotRadius, 0, 2 * Math.PI);
-                ctx.fillStyle = green;
+                ctx.arc(x1, y + sideGap * 0.2, dotRadius, 0, 2 * Math.PI);
+                ctx.fillStyle = red;
                 ctx.fill();
 
                 // Merah
                 ctx.beginPath();
-                ctx.arc(x2, y + sideGap * 0.4, dotRadius, 0, 2 * Math.PI);
+                ctx.arc(x2, y + sideGap * 0.2, dotRadius, 0, 2 * Math.PI);
+                ctx.fillStyle = green;
+                ctx.fill();
+            }
+            for (let i = 0; i < 1; i++) {
+                const y = sideTopY + i * sideGap;
+                const x1 = w * 0.07;
+                const x2 = w * 0.17;
+
+                // Hijau
+                ctx.beginPath();
+                ctx.arc(x1, y + sideGap * 0.7, dotRadius, 0, 2 * Math.PI);
                 ctx.fillStyle = red;
+                ctx.fill();
+
+                // Merah
+                ctx.beginPath();
+                ctx.arc(x2, y + sideGap * 0.7, dotRadius, 0, 2 * Math.PI);
+                ctx.fillStyle = green;
                 ctx.fill();
             }
 
             // ===== Titik di sisi kanan =====
-            for (let i = 0; i < 3; i++) {
-                const y = sideTopY + i * sideGap;
-                const x1 = w * 0.80;
-                const x2 = w * 0.90;
+            for (let i = 0; i < 1; i++) {
+                const y = sideTopY + i * h * 0.08;
+                const x1 = w * 0.72;
+                const x2 = w * 0.84;
 
                 // Hijau
                 ctx.beginPath();
-                ctx.arc(x1, y, dotRadius, 0, 2 * Math.PI);
-                ctx.fillStyle = green;
+                ctx.arc(x1, y + sideGap * 0.6, dotRadius, 0, 2 * Math.PI);
+                ctx.fillStyle = red;
                 ctx.fill();
 
                 // Merah
                 ctx.beginPath();
-                ctx.arc(x2, y + sideGap * 0.4, dotRadius, 0, 2 * Math.PI);
+                ctx.arc(x2, y + sideGap * 0.6, dotRadius, 0, 2 * Math.PI);
+                ctx.fillStyle = green;
+                ctx.fill();
+            }
+            for (let i = 0; i < 1; i++) {
+                const y = sideTopY + i * sideGap;
+                const x1 = w * 0.77;
+                const x2 = w * 0.87;
+
+                // Hijau
+                ctx.beginPath();
+                ctx.arc(x1, y + sideGap * 0.2, dotRadius, 0, 2 * Math.PI);
                 ctx.fillStyle = red;
+                ctx.fill();
+
+                // Merah
+                ctx.beginPath();
+                ctx.arc(x2, y + sideGap * 0.2, dotRadius, 0, 2 * Math.PI);
+                ctx.fillStyle = green;
+                ctx.fill();
+            }
+            for (let i = 0; i < 1; i++) {
+                const y = sideTopY + i * sideGap;
+                const x1 = w * 0.75;
+                const x2 = w * 0.85;
+
+                // Hijau
+                ctx.beginPath();
+                ctx.arc(x1, y + sideGap * 1, dotRadius, 0, 2 * Math.PI);
+                ctx.fillStyle = red;
+                ctx.fill();
+
+                // Merah
+                ctx.beginPath();
+                ctx.arc(x2, y + sideGap * 1, dotRadius, 0, 2 * Math.PI);
+                ctx.fillStyle = green;
                 ctx.fill();
             }
 
             // ===== Kotak hijau dan biru di bawah =====
+            ctx.fillStyle = red;
+            ctx.fillRect(w * 0.8, h * 0.81, boxWidth, boxHeight);
             ctx.fillStyle = green;
-            ctx.fillRect(w * 0.18, bottomY, boxWidth, boxHeight);
-            ctx.fillRect(w * 0.7, bottomY - h * 0.08, boxWidth, boxHeight);
+            ctx.fillRect(w * 0.18, bottomY - h * 0.08, boxWidth, boxHeight);
 
             ctx.fillStyle = blue;
-            ctx.fillRect(w * 0.48, bottomY + h * 0.06, boxBlueWidth, boxBlueHeight);
+            ctx.fillRect(w * 0.38, bottomY + h * 0.06, boxBlueWidth, boxBlueHeight);
         },
 
         drawGPSCanvas() {
@@ -578,14 +661,31 @@ const x_data = () => {
 
         drawOrigin() {
             const ctx = this.gpsTracker.ctx;
-            const origin = this.xyToCanvas(0, 0);
-            ctx.beginPath();
-            ctx.arc(origin.canvasX, origin.canvasY, 6, 0, 2 * Math.PI);
-            ctx.fillStyle = '#ff0000ff';
-            ctx.fill();
-            ctx.strokeStyle = '#000000ff';
-            ctx.lineWidth = 2;
-            ctx.stroke();
+            const origin = this.xyToCanvas(157, 29);
+            if (this.gpsTracker.shipImageLoaded && this.gpsTracker.shipImage) {
+                const size = this.gpsTracker.shipImageSize;
+                ctx.save();
+                ctx.translate(origin.canvasX, origin.canvasY);
+                // kalau mau bisa ditambah rotate di sini:
+                // ctx.rotate(angleRad);
+                ctx.drawImage(
+                    this.gpsTracker.shipImage,
+                    -size / 2,
+                    -size / 2,
+                    size,
+                    size
+                );
+                ctx.restore();
+            } else {
+                // fallback: lingkaran merah seperti dulu kalau gambar belum siap
+                ctx.beginPath();
+                ctx.arc(origin.canvasX, origin.canvasY, 6, 0, 2 * Math.PI);
+                ctx.fillStyle = '#ff0000ff';
+                ctx.fill();
+                ctx.strokeStyle = '#000000ff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
         },
 
         drawPath() {
@@ -643,6 +743,12 @@ const x_data = () => {
         updateGPSFromVehicle() {
             const lat = this.vehicleData.lat;
             const lon = this.vehicleData.long;
+            if (Math.abs(lat) > 100 || Math.abs(lon) > 100) {
+                lat = lat / 1e7;
+                lon = lon / 1e7;
+            }
+            this.vehicleData.lat = lat;
+            this.vehicleData.long = lon;
 
             // Skip jika data GPS tidak valid atau tracking tidak aktif
             if (!this.gpsTracker.isTracking) return;
@@ -797,6 +903,7 @@ const x_data = () => {
             });
             this.drawGPSCanvas();
             toastr.success('GPS data cleared');
+            this.startGPSTracking();
         },
 
         async requestWakeLock() {
