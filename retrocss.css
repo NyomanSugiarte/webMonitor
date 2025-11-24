@@ -141,6 +141,29 @@ body {
     border-radius: 2px;
     border: 1px solid #111;
 }
+.logo-image{
+    height: 150px;
+}
+.center-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+/* area krem besar di bawah header */
+.content {
+    height: calc(100% - 50px);      /* sesuaikan dengan tinggi header */
+    padding: 20px;
+
+    display: flex;
+    justify-content: center;        /* center horizontal */
+    align-items: center;            /* center vertikal */
+}
+
+/* kalau perlu batas lebar kotak welcome */
+.welcome-box {
+    max-width: 400px;
+    width: 100%;
+}
 
 /* Canvas GPS biar ikut gaya */
 #gpsCanvas {
