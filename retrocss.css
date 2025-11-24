@@ -201,3 +201,83 @@ body {
     font-size: 12px;
     text-align: center;
 }
+
+/* RESPONSIVE UNTUK HP */
+@media (max-width: 768px) {
+
+  /* badan halaman */
+  body {
+    padding: 10px 0;
+  }
+
+  .page-container {
+    max-width: 100%;
+    padding: 12px 16px;
+  }
+
+  /* header atas */
+  .header {
+    margin: 8px 12px 16px;
+    padding: 12px 16px;
+    flex-direction: column;      /* tadinya kiri–kanan, di HP jadi atas–bawah */
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .header > div:last-child {
+    text-align: left;           /* jangan rata kanan di HP */
+  }
+
+  /* konten dalam container bootstrap */
+  .container-fluid {
+    padding: 0 16px;
+  }
+
+  /* menu utama (pilihan lintasan dsb.) */
+  .menu-selection,
+  .login-container {
+    padding: 1rem;
+  }
+
+  .menu-card,
+  .login-card {
+    padding: 1.5rem 1.25rem;
+    border-radius: 18px;
+  }
+
+  .menu-title {
+    font-size: 1.6rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .menu-subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .menu-options {
+    grid-template-columns: 1fr; /* 1 kolom di HP */
+    gap: 1.25rem;
+  }
+
+  .menu-option {
+    padding: 1.75rem 1.25rem;
+  }
+
+  /* grid dashboard 3x2 / 6 card → jadi 1 kolom */
+  .dashboard-grid-3x2 {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+
+  .grid-6-cards {
+    grid-template-columns: 1fr;
+    margin: 20px auto;
+  }
+
+  .card-custom {
+    min-height: auto;  /* biar tinggi kartu fleksibel di HP */
+  }
+}
+
+
