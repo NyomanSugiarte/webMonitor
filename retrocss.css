@@ -1,0 +1,180 @@
+/* ================================
+   RETRO WINDOW (mirip Windows 95)
+   ================================ */
+
+body {
+    background: #f0f0f5;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Desktop background */
+.desktop {
+    padding: 24px;
+}
+
+/* Frame jendela */
+.retro-window {
+    width: 980px;
+    max-width: 100%;
+    border: 3px solid #111;
+    border-radius: 6px;
+    background: #fbeedc; /* beige */
+    box-shadow: 0 10px 0 #111;
+}
+
+/* Title bar orange */
+.retro-titlebar {
+    background: #f8993a;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    border-bottom: 2px solid #111;
+}
+
+.retro-titlebar .retro-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Tombol kecil kanan (min, max, close) */
+.retro-window-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.retro-btn {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #111;
+    background: #fbeedc;
+    display: inline-block;
+}
+
+/* Bisa beda warna kalau mau */
+.retro-btn-close {
+    background: #ffb3b3;
+}
+
+/* Menu bar: File Edit View Help */
+.retro-menubar {
+    background: #fdfaf3;
+    border-bottom: 2px solid #111;
+    padding: 4px 12px;
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+}
+
+.retro-menubar span {
+    cursor: default;
+    text-decoration: underline;
+}
+
+/* Isi jendela */
+.retro-body {
+    padding: 16px;
+}
+
+/* Page-container di dalam retro window */
+.page-container {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header di dalam retro body supaya simple */
+.header {
+    background: transparent;
+    color: #111;
+    padding: 0 0 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #c4c4c4;
+}
+
+.header::before {
+    content: none; /* matikan overlay grid lama */
+}
+
+/* Status badge dibuat kotak kecil */
+.status-connected,
+.status-disconnected {
+    border-radius: 2px;
+    box-shadow: none;
+    font-size: 11px;
+    padding: 2px 8px;
+}
+
+/* Grid card menempel ke tepi isi jendela */
+.grid-6-cards {
+    margin: 0;
+}
+
+/* Card dibuat flat & kotak seperti ikon window */
+.card-custom {
+    border-radius: 4px;
+    border: 2px solid #111;
+    background: #fdfaf3;
+    box-shadow: none;
+}
+
+/* Judul card tipis */
+.card-title {
+    border-bottom: none;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+/* Area gambar / canvas */
+.image-placeholder {
+    background: #ffffff;
+    border-radius: 2px;
+    border: 1px solid #111;
+}
+
+/* Canvas GPS biar ikut gaya */
+#gpsCanvas {
+    border: 2px solid #111;
+    border-radius: 2px;
+    background: #ffffff;
+}
+.icon-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 kotak ke samping */
+    gap: 20px;                              /* jarak antar kotak */
+    padding: 16px 8px;
+}
+
+.icon-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+}
+.BOLD {
+    font-weight: 700;
+}
+.icon-box .icon {
+    width: 56px;
+    height: 40px;
+    border: 2px solid #111;
+    border-radius: 4px;
+    background: #ffffff;
+    margin-bottom: 6px;
+}
+
+.icon-label {
+    font-size: 12px;
+    text-align: center;
+}
