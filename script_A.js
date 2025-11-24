@@ -9,6 +9,7 @@ const x_data = () => {
         correctPassword: 'andover',
 
         ipAddress: "https://jetson.andover.my.id",
+        //ipAddress: "http://192.168.1.100:5001",
         port: "/dev/pixhawk",
         baudrate: "9600",
         realtimeData: true,
@@ -102,7 +103,7 @@ const x_data = () => {
                 }
             }
             this.socket = io(this.ipAddress, {
-                transports: ["websocket", "polling"],
+                transports: ["polling"],
                 path: "/socket.io/",
             });
 
