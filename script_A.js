@@ -8,8 +8,8 @@ const x_data = () => {
         correctUsername: 'krakatau',
         correctPassword: 'andover',
 
-        //ipAddress: "https://jetson.andover.my.id",
-        ipAddress: "http://192.168.1.100:5001",
+        ipAddress: "https://jetson.andover.my.id",
+        //ipAddress: "http://192.168.1.100:5001",
         port: "/dev/pixhawk",
         baudrate: "9600",
         realtimeData: true,
