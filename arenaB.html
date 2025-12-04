@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="retrocss.css">
 </head>
 
@@ -20,40 +19,41 @@
         <div class="desktop">
             <div class="retro-window">
                 <div class="retro-titlebar">
-                    <div class="logo-text-box">
-                        <img src="/img/UNIVERSITASTEKNOKRAT.png" alt="logo" class="logo-header me-2"></img>
-                        <h6 class="text-retro">UNIVERSITAS TEKNOKRAT INDONESIA</h6>
-                    </div>
+                    <span class="fas fa-university me-2"></span>UNIVERSITAS TEKNOKRAT INDONESIA
                     <div class="retro-window-buttons">
                         <span class="retro-btn retro-btn-min"></span>
                         <span class="retro-btn retro-btn-max"></span>
                         <span class="retro-btn retro-btn-close"></span>
-                        <template x-if="vehicleData.app_connect">
-                            <span class="status-connected"><i class="text-retro">CONNECTED</i></span>
-                        </template>
-                        <template x-if="!vehicleData.app_connect">
-                            <span class="status-disconnected"><i class="text-retro">DISCONNECTED</i></span>
-                        </template>
                     </div>
-                    <div class="logo-text-box">
-                        <i class="text-retro" x-text="currentTime"></i>
-                        <i class="text-retro">/</i>
-                        <i class="text-retro" x-text="currentDate"></i>
+                    <template x-if="vehicleData.app_connect">
+                        <span class="status-connected"><i class="fas fa-wifi me-1"></i>CONNECTED</span>
+                    </template>
+                    <template x-if="!vehicleData.app_connect">
+                        <span class="status-disconnected"><i
+                                class="fas fa-exclamation-circle me-1"></i>DISCONNECTED</span>
+                    </template>
+                    <div class="text">
+                        <span x-text="currentTime"></span>
+                        <i>/</i>
+                        <span x-text="currentDate"></span>
                     </div>
                 </div>
                 <div class="retro-body">
                     <div class="page-container">
                         <div class="header">
                             <div>
-                                <span class="logo-text-box">
-                                    <img src="/img/andover.png" alt="logo" class="logo-header-and me-2"></img>
-                                    <h6 class="text-retro2">KRAKATAU ANDOVER - LINTASAN B</h6>
-                                </span>
+                                <div>
+                                    <span class="retro-title">
+                                        <i class="fas fa-ship me-2"></i>KRAKATAU ANDOVER - LINTASAN B
+                                    </span>
+
+                                </div>
                             </div>
                             <div class="icon-grid">
                                 <!-- Box 1 -->
                                 <div class="card-custom p-3">
-                                    <div class="text-retro2">SURFACE CAMERA STREAM</div>
+
+                                    <div class="icon">SURFACE CAMERA STREAM</div>
                                     <div class="card-body-flex">
                                         <img :key="surfaceCamera.refreshStream" class="image-placeholder image-fill"
                                             :src="surfaceCamera.streamUrl" alt="Surface Camera" />
@@ -64,7 +64,7 @@
                                 <!-- Box 2 -->
                                 <div class="card-custom p-3">
 
-                                    <div class="text-retro2">GPS TRAJECTORY
+                                    <div class="icon">GPS TRAJECTORY
                                     </div>
                                     <div id="canvasContainer">
                                         <canvas id="gpsCanvas" width="300" height="300"></canvas>
@@ -80,7 +80,7 @@
                                 <!-- Box 3 -->
                                 <div class="card-custom p-3">
 
-                                    <div class="text-retro2">UNDERWATER CAMERA STREAM
+                                    <div class="icon">UNDERWATER CAMERA STREAM
                                     </div>
                                     <div class="card-body-flex">
                                         <img class="image-placeholder image-fill" :src="underwaterCamera.streamUrl"
@@ -92,14 +92,14 @@
                                 <!-- Box 4 -->
                                 <div class="card-custom p-3">
 
-                                    <div class="text-retro2">SURFACE IMAGE</div>
+                                    <div class="icon">SURFACE IMAGE</div>
                                     <img class="image-placeholder" :src="surfaceCamera.image" alt="Surface Image" />
 
                                 </div>
 
                                 <!-- Box 5 -->
                                 <div class="card-custom p-3">
-                                    <div class="text-retro2">
+                                    <div class="icon">
                                         VEHICLE DATA
                                     </div>
 
@@ -159,7 +159,7 @@
                                 <!-- Box 6 -->
                                 <div class="card-custom p-3">
 
-                                    <div class="text-retro2">UNDERWATER IMAGE</div>
+                                    <div class="icon">UNDERWATER IMAGE</div>
                                     <img class="image-placeholder" :src="underwaterCamera.image"
                                         alt="Underwater Image" />
                                 </div>
