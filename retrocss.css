@@ -18,8 +18,8 @@ body {
 
 /* Frame jendela */
 .retro-window {
-    width: 980px;
-    max-width: 100%;
+    width: 100vw;
+    height: 1200px;
     border: 3px solid #111;
     border-radius: 6px;
     background: #fbeedc; /* beige */
@@ -174,9 +174,9 @@ body {
 .icon-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);  /* 3 kotak ke samping */
-    gap: 20px;
+    gap: 60px;
     padding: 16px 8px 24px;
-    max-width: 900px;
+    max-width: 1800px;
     margin: 0 auto;                          /* center di tengah */
 }
 
@@ -271,3 +271,4 @@ body {
         max-height: 220px;
     }
 }
+
