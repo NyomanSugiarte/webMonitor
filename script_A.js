@@ -572,8 +572,8 @@ const x_data = () => {
       const boxBlueHeight = h * 0.025;
 
       // Posisi vertikal relatif
-      const topYGreen = h * 0.24;
-      const topYRed = h * 0.3;
+      const topYGreen = h * 0.13;
+      const topYRed = h * 0.25;
       const sideTopY = h * 0.35;
       const sideGap = h * 0.19;
       const bottomY = h * 0.78;
